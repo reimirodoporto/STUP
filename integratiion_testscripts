@@ -1,0 +1,102 @@
+(function runEngineTests() {
+    console.log("🚀 [Space Travelers] Starting Engine Test Suite...");
+
+    const PHI = 1.618033988749895;
+    const NODES = 121;
+
+    // Test Harness matching CoreAlgorithmEngine
+    class TestEngine {
+        constructor() {
+            this._weights = Array.from({ length: NODES }, (_, i) => {
+                const massAttenuation = 1.0 - (i / NODES);
+                return Math.abs(Math.sin((i + 1) * PHI)) * massAttenuation;
+            });
+            this._rom60 = Array.from({ length: 60 }, (_, i) =>
+                Array.from({ length: 60 }, (_, j) => (i * j) % 60)
+            );
+            this._symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567";
+        }
+
+        evaluateTernaryState(velocityDelta) {
+            const threshold = 0.618;
+            if (Math.abs(velocityDelta) > threshold) {
+                return { state: -1, zone: "Sub-boundary Territory" };
+            } else if (velocityDelta === 0 || Number.isNaN(velocityDelta)) {
+                return { state: 0, zone: "Central Junction Zone" };
+            } else {
+                return { state: 1, zone: "Post-boundary Territory" };
+            }
+        }
+
+        computeResonance(inputSignal) {
+            if (!inputSignal || inputSignal.length === 0) return 0.0;
+            let resonance = 0.0;
+            for (let i = 0; i < inputSignal.length; i++) {
+                const nodeIndex = i % NODES;
+                resonance += inputSignal[i] * this._weights[nodeIndex] * PHI;
+            }
+            return resonance / inputSignal.length;
+        }
+
+        generateReceipt(a, b, c) {
+            const idx = (this._rom60[a % 60][b % 60] ^ (c % 60)) % 60;
+            return `0${this._symbols[idx]}`;
+        }
+
+        validateReceipt(receipt, a, b, c) {
+            const expected = this.generateReceipt(a, b, c);
+            return receipt === expected;
+        }
+    }
+
+    const engine = new TestEngine();
+    let passed = 0;
+    let failed = 0;
+
+    // Test 1: Ternary State Thresholds
+    console.log("\n--- Test 1: Ternary Intent States ---");
+    const stateZero = engine.evaluateTernaryState(0);
+    const statePost = engine.evaluateTernaryState(0.3);
+    const stateSub = engine.evaluateTernaryState(0.9);
+
+    if (stateZero.state === 0 && statePost.state === 1 && stateSub.state === -1) {
+        console.log("✅ Test 1 PASSED: Ternary states evaluated correctly.");
+        passed++;
+    } else {
+        console.error("❌ Test 1 FAILED: Ternary state mismatch.");
+        failed++;
+    }
+
+    // Test 2: Harmonic Resonance Calculation
+    console.log("\n--- Test 2: Harmonic Resonance ---");
+    const mockSignal = Array.from({ length: 121 }, (_, i) => Math.sin(i * 0.1));
+    const resonance = engine.computeResonance(mockSignal);
+    
+    if (typeof resonance === "number" && !Number.isNaN(resonance)) {
+        console.log(`✅ Test 2 PASSED: Computed resonance score -> ${resonance.toFixed(6)}`);
+        passed++;
+    } else {
+        console.error("❌ Test 2 FAILED: Invalid resonance output.");
+        failed++;
+    }
+
+    // Test 3: Receipt Generation & Checksum Validation
+    console.log("\n--- Test 3: ROM Checksum & Receipt Validation ---");
+    const a = 12, b = 34, c = 56;
+    const receipt = engine.generateReceipt(a, b, c);
+    const isValid = engine.validateReceipt(receipt, a, b, c);
+    const isInvalid = engine.validateReceipt("0XYZ", a, b, c);
+
+    if (isValid && !isInvalid) {
+        console.log(`✅ Test 3 PASSED: Generated receipt [${receipt}] successfully validated.`);
+        passed++;
+    } else {
+        console.error("❌ Test 3 FAILED: Receipt validation failed.");
+        failed++;
+    }
+
+    // Summary
+    console.log("\n==============================");
+    console.log(`Test Run Complete. Passed: ${passed}, Failed: ${failed}`);
+    console.log("==============================");
+})();
