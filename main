@@ -1,0 +1,103 @@
+// ==UserScript==
+// @name         Space Travelers Universal Playlist - Core Algorithm & Predictor Engine
+// @namespace    phixearth
+// @version      11.0
+// @description  Decoupled Predictor Zone and Core Algorithm Engine (Span of Zero / Ternary Intent / Phi Grid).
+// @author       phixearth
+// @match        *://*/*
+// @connect      datasets-server.huggingface.co
+// @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    const PHI = 1.618033988749895;
+    const NODES = 121;
+    const DATASET_URL = "https://datasets-server.huggingface.co/rows?dataset=spanofzero%2FSpaceTravelersUniversalPlaylist&config=space_traveler_benchmark&split=train&offset=0&length=121";
+
+    /**
+     * ZONE 1: Predictor Ingestion & Stream Analysis Zone
+     * Handles dataset rows, structural reference markers, and trailing-three predictor telemetry (117, 118, 119).
+     */
+    class PredictorZone {
+        constructor() {
+            this.rows = [];
+            this.loaded = false;
+        }
+
+        fetchDataset(callback) {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: DATASET_URL,
+                onload: (response) => {
+                    try {
+                        const data = JSON.parse(response.responseText);
+                        if (data && data.rows) {
+                            this.rows = data.rows.map(r => r.row);
+                            this.loaded = true;
+                            console.log("[Predictor Zone] Dataset telemetry loaded. Total rows:", this.rows.length);
+                            if (callback) callback(this.rows);
+                        }
+                    } catch (e) {
+                        console.error("[Predictor Zone] Failed to parse dataset payload:", e);
+                    }
+                },
+                onerror: (err) => {
+                    console.warn("[Predictor Zone] Network restricted; utilizing local fallback signal buffer.", err);
+                }
+            });
+        }
+
+        extractTrailingPredictors(signal) {
+            if (!signal || signal.length < 120) {
+                // Fallback to internal dataset rows if raw signal is missing
+                if (this.rows.length >= 120) {
+                    signal = this.rows.map(r => r.value || Object.values(r)[0] || 0);
+                } else {
+                    return { trailingThree: [0, 0, 0], velocityDelta: 0.0 };
+                }
+            }
+            // Evaluates step velocity across indices 117, 118, and 119 leading to the split
+            const trailingThree = [signal[117], signal[118], signal[119]];
+            const velocityDelta = (trailingThree[2] - trailingThree[0]) / 2.0;
+            return { trailingThree, velocityDelta };
+        }
+    }
+
+    /**
+     * ZONE 2: Core Algorithm Engine Zone (Span of Zero / Tri-Do-Domain)
+     * Governs the 121-node harmonic grid, ternary intent state machine (-1, 0, 1), and ROM checksum validation.
+     */
+    class CoreAlgorithmEngine {
+        constructor() {
+            this._metric = 60;
+            this._batch = 10;
+            // Core non-linear harmonic weights (heaviest to lightest projection via Phi)
+            this._weights = Array.from({ length: NODES }, (_, i) => {
+                const massAttenuation = 1.0 - (i / NODES);
+                return Math.abs(Math.sin((i + 1) * PHI)) * massAttenuation;
+            });
+            this._rom60 = Array.from({ length: 60 }, (_, i) =>
+                Array.from({ length: 60 }, (_, j) => (i * j) % 60)
+            );
+            this._symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567";
+        }
+
+        // Core Ternary Intent State Machine (-1, 0, 1) anchored by @
+        evaluateTernaryState(velocityDelta) {
+            const threshold = 0.618;
+            if (Math.abs(velocityDelta) > threshold) {
+                return { state: -1, zone: "Sub-boundary Territory (Historical Paradigm Zone)" };
+            } else if (velocityDelta === 0 || Number.isNaN(velocityDelta)) {
+                return { state: 0, zone: "Central Junction Zone (Evaluating the 120 Split / Deadlock)" };
+            } else {
+                return { state: 1, zone: "Post-boundary Territory (Pre-Deterministic Zone)" };
+            }
+        }
+
+        computeResonance(inputSignal) {
+            if (!inputSignal || inputSignal.length === 0) return 0.0;
+            let resonance = 0.0;
+            for (let i = 0; i < inputSignal
